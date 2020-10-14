@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const Item = require("../models/Item");
 
+// GET ALL ITEMS
+
 router.get("/items", async (req, res, next) => {
   try {
     const allItems = await Item.find();
@@ -11,6 +13,8 @@ router.get("/items", async (req, res, next) => {
     next(error);
   }
 });
+
+// GET ONE ITEM
 
 router.get("/item/:id", async (req, res, next) => {
   try {
@@ -22,6 +26,8 @@ router.get("/item/:id", async (req, res, next) => {
   }
 });
 
+// CREATE ONE ITEM
+
 router.post("/items", async (req, res, next) => {
   try {
     const createdItem = await Item.create(req.body);
@@ -32,6 +38,8 @@ router.post("/items", async (req, res, next) => {
   }
 });
 
+// UPDATE ONE ITEM
+
 router.patch("/item/:id/edit", async (req, res, next) => {
   try {
     const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body);
@@ -41,6 +49,8 @@ router.patch("/item/:id/edit", async (req, res, next) => {
     next(error);
   }
 });
+
+// DELETE ONE ITEM
 
 router.delete("/item/:id/delete", async (req, res, next) => {
   try {
