@@ -1,0 +1,55 @@
+const express = require("express");
+const router = express.Router();
+const Item = require("../models/Item");
+
+router.get("/items", async (req, res, next) => {
+  try {
+    const allItems = await Item.find();
+    res.status(200).json(allItems);
+  } catch (error) {
+    res.status(500);
+    next(error);
+  }
+});
+
+router.get("/item/:id", async (req, res, next) => {
+  try {
+    const selectedItem = await Item.findById(req.params.id, { new: true });
+    res.status(200).json(selectedItem);
+  } catch (error) {
+    res.status(500);
+    next(error);
+  }
+});
+
+router.post("/items", async (req, res, next) => {
+  try {
+    const createdItem = await Item.create(req.body);
+    res.status(201).json(createdItem);
+  } catch (error) {
+    res.status(500);
+    next(error);
+  }
+});
+
+router.patch("/item/:id/edit", async (req, res, next) => {
+  try {
+    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body);
+    res.status(200).json(updatedItem);
+  } catch (error) {
+    res.status(500);
+    next(error);
+  }
+});
+
+router.delete("/item/:id/delete", async (req, res, next) => {
+  try {
+    const deletedItem = await Item.findByIdAndDelete(req.params.id);
+    res.status(204).json(deletedItem);
+  } catch (error) {
+    res.status(500);
+    next(error);
+  }
+});
+
+module.exports = router;
