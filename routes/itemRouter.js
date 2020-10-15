@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Item = require("../models/Item");
+const uploader = require("../config/cloudinary");
 
 // GET ALL ITEMS
 
@@ -28,15 +29,22 @@ router.get("/item/:id", async (req, res, next) => {
 
 // CREATE ONE ITEM
 
-router.post("/items", async (req, res, next) => {
-  try {
-    const createdItem = await Item.create(req.body);
-    res.status(201).json(createdItem);
-  } catch (error) {
-    res.status(500);
-    next(error);
+router.post(
+  "/item/create",
+  uploader.single("image"),
+  async (req, res, next) => {
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
+    try {
+      const createdItem = await Item.create(req.body);
+      res.status(201).json(createdItem);
+    } catch (error) {
+      res.status(500);
+      next(error);
+    }
   }
-});
+);
 
 // UPDATE ONE ITEM
 

@@ -24,4 +24,16 @@ router.patch("/user/edit", uploader.single("image"), async (req, res, next) => {
   }
 });
 
+// DELETE USER/PROFILE
+
+router.delete("/user/delete", async (req, res, next) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.session.currentUser);
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(500);
+    next(err);
+  }
+});
+
 module.exports = router;
