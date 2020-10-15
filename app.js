@@ -42,9 +42,11 @@ app.use(function (req, res, next) {
 
 const authRouter = require("./routes/auth");
 const itemRouter = require("./routes/itemRouter");
+const userRouter = require("./routes/userRouter");
 
 app.use("/api/auth", authRouter);
 app.use("/", itemRouter);
+app.use("/", userRouter);
 
 // 404 Middleware
 app.use((req, res, next) => {

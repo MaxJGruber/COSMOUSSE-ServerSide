@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const uploadCloud = require("../config/cloudinary");
 
 const salt = 10;
 
@@ -13,29 +14,42 @@ router.post("/signin", (req, res, next) => {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
-      const isValidPassword = bcrypt.compareSync(password, userDocument.password);
+      const isValidPassword = bcrypt.compareSync(
+        password,
+        userDocument.password
+      );
       if (!isValidPassword) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
-      
+
       req.session.currentUser = userDocument._id;
       res.redirect("/api/auth/isLoggedIn");
     })
     .catch(next);
 });
 
-router.post("/signup", (req, res, next) => {
-  const { email, password, firstName, lastName } = req.body;
+router.post("/signup", uploadCloud.single("profileImage"), (req, res, next) => {
+  const { email, password, firstName, lastName, birthday } = req.body;
 
   User.findOne({ email })
     .then((userDocument) => {
       if (userDocument) {
         return res.status(400).json({ message: "Email already taken" });
       }
-
       const hashedPassword = bcrypt.hashSync(password, salt);
-      const newUser = { email, lastName, firstName, password: hashedPassword };
+      const newUser = {
+        email,
+        lastName,
+        birthday,
+        firstName,
+        password: hashedPassword,
+      };
 
+      if (req.file) {
+        console.log(req.file);
+        newUser.profileImage = req.file.path;
+      }
+      console.log(newUser);
       User.create(newUser)
         .then((newUserDocument) => {
           /* Login on signup */
@@ -63,7 +77,10 @@ router.get("/isLoggedIn", (req, res, next) => {
 router.get("/logout", (req, res, next) => {
   req.session.destroy(function (error) {
     if (error) next(error);
-    else res.status(200).json({ message: "Succesfully disconnected." });
+    else {
+      res.status(200).json({ message: "Succesfully disconnected." });
+  
+    }
   });
 });
 
