@@ -7,7 +7,7 @@ const uploader = require("../config/cloudinary");
 
 router.get("/items", async (req, res, next) => {
   try {
-    const allItems = await Item.find();
+    const allItems = await Item.find({ added_by: req.session.currentUser });
     res.status(200).json(allItems);
   } catch (error) {
     res.status(500);
@@ -37,7 +37,9 @@ router.post(
       req.body.image = req.file.path;
     }
     try {
-      const createdItem = await Item.create(req.body);
+      const data = req.body;
+      data.added_by = req.session.currentUser;
+      const createdItem = await Item.create(data);
       res.status(201).json(createdItem);
     } catch (error) {
       res.status(500);

@@ -6,6 +6,9 @@ const uploadCloud = require("../config/cloudinary");
 
 const salt = 10;
 
+const getAge = (birthDate) =>
+  Math.floor((new Date() - new Date(birthDate).getTime()) / 3.15576e10);
+
 router.post("/signin", (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email })
@@ -36,6 +39,11 @@ router.post("/signup", uploadCloud.single("profileImage"), (req, res, next) => {
       if (userDocument) {
         return res.status(400).json({ message: "Email already taken" });
       }
+      getAge(birthday);
+      if (getAge(birthday) < 18) {
+        return res.status(400).json({ message: "Too young to use this app" });
+      }
+
       const hashedPassword = bcrypt.hashSync(password, salt);
       const newUser = {
         email,
@@ -79,7 +87,6 @@ router.get("/logout", (req, res, next) => {
     if (error) next(error);
     else {
       res.status(200).json({ message: "Succesfully disconnected." });
-  
     }
   });
 });
