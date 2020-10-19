@@ -19,7 +19,7 @@ router.get("/items", async (req, res, next) => {
 
 router.get("/item/:id", async (req, res, next) => {
   try {
-    const selectedItem = await Item.findById(req.params.id, { new: true });
+    const selectedItem = await Item.findById(req.params.id);
     res.status(200).json(selectedItem);
   } catch (error) {
     res.status(500);
@@ -50,15 +50,24 @@ router.post(
 
 // UPDATE ONE ITEM
 
-router.patch("/item/:id/edit", async (req, res, next) => {
-  try {
-    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body);
-    res.status(200).json(updatedItem);
-  } catch (error) {
-    res.status(500);
-    next(error);
+router.patch(
+  "/item/:id/edit",
+  uploader.single("image"),
+  async (req, res, next) => {
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
+    try {
+      const data = req.body;
+      data.added_by = req.session.currentUser;
+      const updatedItem = await Item.findByIdAndUpdate(req.params.id, data);
+      res.status(200).json(updatedItem);
+    } catch (error) {
+      res.status(500);
+      next(error);
+    }
   }
-});
+);
 
 // DELETE ONE ITEM
 
