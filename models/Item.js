@@ -22,7 +22,11 @@ const itemSchema = new Schema({
   price: Number,
   priceHH: Number,
   description: String,
-  image: String,
+  image: {
+    type: String,
+    default:
+      "https://www.sciencenews.org/wp-content/uploads/2020/05/050620_mt_beer_feat-1028x579.jpg",
+  },
   location: {
     type: {
       type: String,
